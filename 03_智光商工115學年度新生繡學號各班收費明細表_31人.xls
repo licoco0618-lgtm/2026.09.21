@@ -1,0 +1,94 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" 
+      xmlns:x="urn:schemas-microsoft-com:office:excel" 
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!--[if gte mso 9]>
+  <xml>
+    <x:ExcelWorkbook>
+      <x:ExcelWorksheets>
+        <x:ExcelWorksheet>
+          <x:Name>繡學號收費明細表</x:Name>
+          <x:WorksheetOptions>
+            <x:DisplayGridlines/>
+          </x:WorksheetOptions>
+        </x:ExcelWorksheet>
+      </x:ExcelWorksheets>
+    </x:ExcelWorkbook>
+  </xml>
+  <![endif]-->
+  <style>
+    body { font-family: "微軟正黑體", "Microsoft JhengHei", Arial, sans-serif; font-size: 11pt; }
+    table { border-collapse: collapse; table-layout: fixed; width: 100%; }
+    th, td { border: 0.5pt solid #94a3b8; padding: 5px 6px; font-size: 10.5pt; font-family: "微軟正黑體", "Microsoft JhengHei", Arial, sans-serif; }
+    th { background-color: #f1f5f9; font-weight: bold; text-align: center; vertical-align: middle; }
+    .main-title { font-size: 16pt; font-weight: bold; text-align: center; border: none; height: 42px; vertical-align: middle; }
+    .sign-row { font-size: 11pt; font-weight: bold; border: none; height: 32px; vertical-align: middle; }
+    .footer-total { background-color: #e2e8f0; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td colspan="12" class="main-title">智光商工115學年度新生繡學號各班收費明細表</td>
+    </tr>
+    <tr>
+      <td colspan="3" class="sign-row">班級：資處一仁</td>
+      <td colspan="3" class="sign-row">班長簽章：</td>
+      <td colspan="3" class="sign-row">總務股長簽章：</td>
+      <td colspan="3" class="sign-row">導師簽章：</td>
+    </tr>
+    <tr>
+      <th style="width: 50px;">座號</th>
+      <th style="width: 85px;">姓名</th>
+      <th style="width: 95px;">學號</th>
+      <th style="width: 95px;">夏季短袖<br>制服上衣 ($55)</th>
+      <th style="width: 95px;">冬季長袖<br>制服上衣 ($55)</th>
+      <th style="width: 95px;">夏季短袖<br>運動上衣 ($55)</th>
+      <th style="width: 95px;">冬季長袖<br>運動上衣 ($55)</th>
+      <th style="width: 85px;">各科<br>實習服 ($55)</th>
+      <th style="width: 70px;">帽子<br>($55)</th>
+      <th style="width: 105px; background-color: #fef3c7; color: #b45309;">冬季棒球<br>運動外套 ($65)</th>
+      <th style="width: 85px;">合計 (元)</th>
+      <th style="width: 80px;">簽名/繳費</th>
+    </tr>
+    <tr><td style="text-align:center;">1</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">2</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">3</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">4</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">5</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">6</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">7</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">8</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">9</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">10</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">11</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">12</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">13</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">14</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">15</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">16</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">17</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">18</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">19</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">20</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">21</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">22</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">23</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">24</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">25</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">26</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">27</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">28</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">29</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">30</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr><td style="text-align:center;">31</td><td></td><td style="mso-number-format:'\@';"></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="background-color:#fef3c7;">0</td><td style="text-align:right;">$0</td><td></td></tr>
+    <tr class="footer-total">
+      <td colspan="3" style="text-align:center; font-weight:bold;">全班各品項總件數合計</td>
+      <td style="text-align:center;">0</td><td style="text-align:center;">0</td><td style="text-align:center;">0</td><td style="text-align:center;">0</td><td style="text-align:center;">0</td><td style="text-align:center;">0</td><td style="text-align:center; background-color:#fef3c7;">0</td>
+      <td style="text-align:right; font-weight:bold; color:#1e3a8a;">$0</td>
+      <td style="text-align:center;">共0件</td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+  <title>智光商工115學年度新生繡學號管理系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 頂部系統導覽列 -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="school-badge">智光商工</div>
+        <div class="brand-title">
+          <h1>115學年度新生繡學號作業系統</h1>
+          <p>整合 01 日程表、02 流程圖解、03 收費明細表 (31人名冊)</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-outline-light" onclick="triggerPrint()" title="符合官方A4標準版面">
+          🖨️ <span class="btn-text">列印收費表 (A4)</span>
+        </button>
+        <button type="button" class="btn btn-success" onclick="exportToExcel()" title="下載 Excel 原生試算表 (.xls)，繁體中文 100% 正確不亂碼">
+          📊 <span class="btn-text">下載 Excel 檔</span>
+        </button>
+        <button type="button" class="btn btn-outline-light" onclick="copyTableToClipboard()" title="複製表格內容，打開 Excel 按 Ctrl+V 直接貼上">
+          📋 <span class="btn-text">複製到 Excel</span>
+        </button>
+        <button type="button" class="btn btn-outline-light" onclick="exportToCSV()" title="匯出相容 CSV 檔 (含微軟 UTF-8 BOM)">
+          📥 <span class="btn-text">匯出 CSV</span>
+        </button>
+        <button type="button" class="btn btn-warning" onclick="openSyncHubModal()" title="手機填好傳到電腦，或電腦接收手機最新名冊">
+          📲 <span class="btn-text">手機 ⇄ 電腦同步</span>
+        </button>
+        <label class="btn btn-outline-light" style="cursor: pointer; margin: 0;" title="匯入已整理之 CSV 名單 (自動支援 UTF-8 與 Big5)">
+          📤 <span class="btn-text">匯入 CSV</span>
+          <input type="file" id="csvFileInput" accept=".csv,.txt,.tsv" style="display: none;" onchange="handleCSVImport(event)">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <!-- 功能標籤頁分頁切換 -->
+  <nav class="nav-tabs-wrapper">
+    <div class="nav-tabs">
+      <button type="button" class="tab-btn active" data-tab="tab-fee-detail">
+        📋 03 各班收費明細表 <span class="badge-tag">31人</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-schedule">
+        🗓️ 01 繡學號日程表
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-process">
+        📌 02 送繡作業流程
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-cash">
+        💵 總務現金對帳機
+      </button>
+    </div>
+  </nav>
+
+  <!-- 主內容區域 -->
+  <main class="main-container">
+
+    <!-- ======================================================= -->
+    <!-- 分頁 1: 03 各班收費明細表 (31位學生完整名冊)                -->
+    <!-- ======================================================= -->
+    <section id="tab-fee-detail" class="tab-content active">
+
+      <!-- 列印專屬表頭 (完全依原 PDF 03 排版) -->
+      <div class="print-only-header">
+        <div class="print-official-title">智光商工115學年度新生繡學號各班收費明細表</div>
+        <div class="print-sign-row">
+          <div class="print-sign-item">班長簽章：<span id="printLeaderHeader" class="print-sign-line"></span></div>
+          <div class="print-sign-item">總務股長簽章：<span id="printAffairsHeader" class="print-sign-line"></span></div>
+          <div class="print-sign-item">導師簽章：<span id="printTutorHeader" class="print-sign-line"></span></div>
+          <div class="print-sign-item">班級：<span id="printClassHeader" style="font-weight: bold; min-width: 80px; display: inline-block;">資處一仁</span></div>
+        </div>
+      </div>
+
+      <!-- 儀表板統計資訊卡片 (網頁模式) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-blue">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statGrandTotal">$0</div>
+            <div class="stat-label">全班應收總金額</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-orange">👕</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statTotalItems">0 件</div>
+            <div class="stat-label">全班送繡總件數</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-green">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statPaidStudents">0 / 31 人</div>
+            <div class="stat-label">已繳費人數</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-purple">💵</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statPaidAmount">$0</div>
+            <div class="stat-label">已實收總金額</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 班級資訊與快速操作工具列 -->
+      <div class="control-panel">
+        <div class="class-info-row">
+          <div class="input-group">
+            <label for="classInput">班級名稱：</label>
+            <input type="text" id="classInput" class="input-control" placeholder="例如：資處一仁" value="資處一仁" style="width: 140px;">
+          </div>
+          <div class="input-group">
+            <label for="leaderInput">班長：</label>
+            <input type="text" id="leaderInput" class="input-control" placeholder="姓名" style="width: 110px;">
+          </div>
+          <div class="input-group">
+            <label for="affairsInput">總務股長：</label>
+            <input type="text" id="affairsInput" class="input-control" placeholder="姓名" style="width: 110px;">
+          </div>
+          <div class="input-group">
+            <label for="tutorInput">導師：</label>
+            <input type="text" id="tutorInput" class="input-control" placeholder="姓名" style="width: 110px;">
+          </div>
+        </div>
+
+        <div class="batch-actions-row">
+          <div class="batch-group">
+            <span style="font-size: 0.88rem; font-weight: 600; color: #475569;">⚡ 快捷工具：</span>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="applyStandardSetToAll()" title="短制+長制+短運+長運+實習服+帽子+外套 各1件">
+              ⭐ 一鍵套用標準全套 (7件/人 $395)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillSampleRoster()">
+              👤 填入 31 位示範名冊
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="clearAllQuantities()" style="color: #dc2626;">
+              🧹 清空所有件數
+            </button>
+          </div>
+          <div>
+            <span style="font-size: 0.85rem; color: #64748b;">* 資料即時自動存檔，重新整理不遺失</span>
+          </div>
+        <div class="excel-sync-bar">
+          <div class="sync-title">📊 <b>Excel 同步與下載專區：</b></div>
+          <div class="sync-buttons">
+            <button type="button" class="btn btn-success btn-sm" onclick="exportToExcel()" title="保證繁體中文微軟正黑體不亂碼、排版美觀、雙擊直接在 Excel 開啟">
+              📊 下載 Excel 檔 (.xls) <span class="badge-tag-sm">⭐ 推薦！繁體字保證正確</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="copyTableToClipboard()" title="一鍵複製全班明細表，到 Excel 按 Ctrl+V 直接貼上">
+              📋 一鍵複製到 Excel 剪貼簿 (按 Ctrl+V 貼上)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="exportToCSV()" title="含微軟 UTF-8 BOM，相容各式試算表">
+              📥 匯出 CSV 檔 (.csv)
+            </button>
+            <button type="button" class="btn btn-warning btn-sm" onclick="openSyncHubModal()" title="手機填好傳到電腦，或電腦讀取手機最新名單">
+              📲 手機 ⇄ 電腦同步精靈
+            </button>
+            <label class="btn btn-secondary btn-sm" style="cursor: pointer; margin: 0;" title="支援 UTF-8 與 Excel 預設 Big5 編碼名冊">
+              📤 匯入 Excel/CSV 名單
+              <input type="file" accept=".csv,.txt,.tsv" style="display: none;" onchange="handleCSVImport(event)">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 檢視模式切換、搜尋與催繳篩選工具列 -->
+      <div class="view-filter-bar">
+        <!-- 模式切換鈕 -->
+        <div class="view-mode-tabs">
+          <button type="button" class="view-tab-btn active" id="btnViewPicker" onclick="switchViewMode('picker')">
+            <span class="tab-icon">👤</span> 選人登記模式 <span class="badge-pill-sub">點名字選衣服</span>
+          </button>
+          <button type="button" class="view-tab-btn" id="btnViewTable" onclick="switchViewMode('table')">
+            <span class="tab-icon">📊</span> 完整試算表 <span class="badge-pill-sub">A4對照</span>
+          </button>
+        </div>
+
+        <!-- 搜尋與繳費狀態篩選 -->
+        <div class="filter-controls-row">
+          <div class="search-box">
+            <span class="search-box-icon">🔍</span>
+            <input type="text" id="studentSearchInput" class="search-input-field" placeholder="搜尋座號、姓名或學號..." oninput="handleStudentSearch(this.value)">
+            <button type="button" id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display:none;" title="清除搜尋">✕</button>
+          </div>
+
+          <div class="status-filter-group">
+            <button type="button" class="status-filter-chip active" data-filter="all" onclick="setStatusFilter('all')">
+              全部 <span class="chip-count" id="filterCountAll">31</span>
+            </button>
+            <button type="button" class="status-filter-chip unpaid" data-filter="unpaid" onclick="setStatusFilter('unpaid')">
+              ⚠️ 未繳費 <span class="chip-count" id="filterCountUnpaid">0</span>
+            </button>
+            <button type="button" class="status-filter-chip paid" data-filter="paid" onclick="setStatusFilter('paid')">
+              ✅ 已繳費 <span class="chip-count" id="filterCountPaid">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 流程提示引導條 -->
+        <div class="picker-instruction-bar">
+          <span class="instruction-icon">👉</span>
+          <span class="instruction-text"><b>請點選下方同學名字 (一排 6 位，共 31 位)</b>，即可展開選擇要繡的衣服品項：</span>
+        </div>
+      </div>
+
+      <!-- 👤 第一步：31 位同學精美點選名冊 (點擊名字即彈出衣服選擇) -->
+      <div id="studentPickerGrid" class="student-picker-grid"></div>
+
+      <!-- 👕 第二步：點選學生後出現的「專屬衣服送繡登記抽屜面板」 (Modal / Bottom Sheet) -->
+      <div id="clothesPickerDrawer" class="clothes-picker-overlay" style="display: none;" onclick="handleOverlayClick(event)">
+        <div class="clothes-picker-sheet">
+          <!-- 頂部拖曳把手 -->
+          <div class="sheet-drag-bar"></div>
+
+          <!-- 學生身份資訊與關閉按鈕 -->
+          <div class="sheet-header">
+            <div class="sheet-student-info">
+              <div class="sheet-seat-badge" id="sheetSeatBadge">#01</div>
+              <div class="sheet-names-box">
+                <div class="sheet-name-row">
+                  <input type="text" id="sheetStudentName" class="sheet-name-input" placeholder="點此輸入姓名" oninput="updateSelectedStudentName(this.value)" onchange="updateSelectedStudentName(this.value)">
+                  <input type="text" id="sheetStudentId" class="sheet-id-input" placeholder="學號" oninput="updateSelectedStudentId(this.value)" onchange="updateSelectedStudentId(this.value)">
+                </div>
+                <div class="sheet-hint-txt">💡 姓名與學號可直接於此修改，自動存檔</div>
+              </div>
+            </div>
+            <button type="button" class="sheet-close-btn" onclick="closeClothesPicker()" title="關閉">✕</button>
+          </div>
+
+          <!-- 應收金額與繳費狀態切換大按鈕 -->
+          <div class="sheet-status-banner">
+            <div class="sheet-cost-summary">
+              <span class="cost-label">個人送繡金額合計</span>
+              <div class="cost-value-wrap">
+                <b class="cost-total-amount" id="sheetTotalAmount">$0</b>
+                <span class="cost-total-qty" id="sheetTotalQty">(0 件)</span>
+              </div>
+            </div>
+            <button type="button" id="sheetPaidBtn" class="sheet-paid-btn unpaid" onclick="toggleSelectedStudentPaid()">
+              ⬜ 點擊標記為已繳費
+            </button>
+          </div>
+
+          <!-- 快捷操作與單人預設 -->
+          <div class="sheet-preset-row">
+            <button type="button" class="sheet-quick-btn primary" onclick="applyStandardSetToSelected()">
+              ⭐ 一鍵全套 7 件 ($395)
+            </button>
+            <button type="button" class="sheet-quick-btn danger" onclick="clearSelectedStudentQuantities()">
+              🧹 清空件數 ($0)
+            </button>
+          </div>
+
+          <!-- 7 項衣服品項大觸控步進器選擇清單 -->
+          <div class="sheet-clothes-section">
+            <div class="sheet-clothes-title">
+              <span>👕 選擇送繡衣服品項與數量：</span>
+              <span style="font-size: 0.78rem; color: #64748b;">(每件55元 / 外套65元)</span>
+            </div>
+            <div class="sheet-items-list" id="sheetItemsList">
+              <!-- 由 JS 動態渲染 7 項大按鈕步進器 -->
+            </div>
+          </div>
+
+          <!-- 底部快速換人與完成導覽條 -->
+          <div class="sheet-bottom-nav">
+            <button type="button" class="sheet-nav-arrow-btn" onclick="navigateStudent(-1)" id="btnPrevStudent">
+              ⬅ 上一位
+            </button>
+            <button type="button" class="sheet-nav-save-btn" onclick="closeClothesPicker()">
+              ✅ 完成確認
+            </button>
+            <button type="button" class="sheet-nav-arrow-btn" onclick="navigateStudent(1)" id="btnNextStudent">
+              下一位 ➡
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📊 試算表格檢視容器 (表格模式，列印時強制顯示) -->
+      <div class="table-card" id="tableViewCard">
+        <div class="table-header-title">
+          <h2>智光商工115學年度新生繡學號各班收費明細表 (共 31 位同學)</h2>
+          <div style="font-size: 0.85rem; color: #64748b;">
+            一般服裝單價：<b>55元</b> | 冬季棒球外套單價：<b>65元</b>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="embroidery-table" id="embroideryMainTable">
+            <thead>
+              <tr>
+                <th class="sticky-col-seat" style="width: 48px;">座號</th>
+                <th class="sticky-col-name" style="width: 90px;">姓名</th>
+                <th style="width: 95px;">學號</th>
+                <th>
+                  夏季短袖<br>制服上衣
+                  <span class="item-price-tag">一件55元</span>
+                </th>
+                <th>
+                  冬季長袖<br>制服上衣
+                  <span class="item-price-tag">一件55元</span>
+                </th>
+                <th>
+                  夏季短袖<br>運動上衣
+                  <span class="item-price-tag">一件55元</span>
+                </th>
+                <th>
+                  冬季長袖<br>運動上衣
+                  <span class="item-price-tag">一件55元</span>
+                </th>
+                <th>
+                  各科<br>實習服
+                  <span class="item-price-tag">一件55元</span>
+                </th>
+                <th>
+                  帽子<br><br>
+                  <span class="item-price-tag">一件55元</span>
+                </th>
+                <th>
+                  冬季棒球<br>運動外套
+                  <span class="item-price-tag highlight">一件65元</span>
+                </th>
+                <th style="width: 75px;">合計</th>
+                <th style="width: 65px;">簽名/繳費</th>
+              </tr>
+            </thead>
+            <!-- 31 位學生資料行 (由 app.js 動態生成) -->
+            <tbody id="studentTableBody"></tbody>
+            <!-- 表底合計統計列 -->
+            <tfoot>
+              <tr>
+                <th colspan="3" class="sticky-col-total-label">全班各品項總件數合計</th>
+                <td id="footer-item1">0</td>
+                <td id="footer-item2">0</td>
+                <td id="footer-item3">0</td>
+                <td id="footer-item4">0</td>
+                <td id="footer-item5">0</td>
+                <td id="footer-item6">0</td>
+                <td id="footer-item7">0</td>
+                <td id="footer-grand-total" class="tfoot-grand-total">$0</td>
+                <td>-</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================= -->
+    <!-- 分頁 2: 01 繡學號日程表                                 -->
+    <!-- ======================================================= -->
+    <section id="tab-schedule" class="tab-content">
+      <div class="schedule-container">
+        <!-- 標題 -->
+        <div style="background: white; padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+          <h2 style="color: var(--primary-color); font-size: 1.3rem;">智光商工115學年度新生（一年級）繡學號日程表</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">請各班同學依日程規定穿著便服並準時送繡，逾期將影響發回時間。</p>
+        </div>
+
+        <!-- 日程卡片格狀排列 -->
+        <div class="timeline-grid">
+          <!-- 9/22 -->
+          <div class="date-card">
+            <div class="date-header">
+              <span class="date-badge">9 月 22 日 (二)</span>
+              <span class="clothing-tag">收繳時間：便服</span>
+            </div>
+            <div class="date-body">
+              <div class="rule-alert">
+                ⚠️ <b>便服穿著規定：</b><br>
+                請依學校便服日之穿著規定，<b>不得穿著裙子、短褲、薄紗、破衣褲等</b>。
+              </div>
+              <ul class="rule-list">
+                <li>新生繡學號第一天集中收繳作業。</li>
+                <li>同學請將預計送繡之衣服備齊，並先完成貼紙標記。</li>
+                <li>送繡衣服請依個人採購品項依序清點。</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 9/23 -->
+          <div class="date-card warning-card">
+            <div class="date-header">
+              <span class="date-badge">9 月 23 日 (三)</span>
+              <span class="clothing-tag" style="background:#ffedd5; color:#c2410c;">補送最後一日：便服</span>
+            </div>
+            <div class="date-body">
+              <div class="rule-alert">
+                ⚠️ <b>便服穿著規定：</b><br>
+                請依學校便服日穿著規定（不得穿裙子、短褲、薄紗、破衣褲等）。
+              </div>
+              <ul class="rule-list">
+                <li><b>補行送繡：</b>開放 9/22(二) 未到校之同學或其它同學補行送繡。</li>
+                <li><b>最後期限：</b>※最後乙日開放同學補行送繡，請把握時間繳交！</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 9/24 -->
+          <div class="date-card success-card">
+            <div class="date-header">
+              <span class="date-badge">9 月 24 日 (四)</span>
+              <span class="clothing-tag" style="background:#dcfce7; color:#15803d;">體檢送回：便服</span>
+            </div>
+            <div class="date-body">
+              <div class="rule-alert" style="background: #ecfdf5; border-color: #10b981; color: #065f46;">
+                🏥 <b>一年級新生體檢日提醒：</b><br>
+                便服穿著<b>請勿太複雜</b>，以方便穿脫檢查為原則，以免造成自身體檢之不便。
+              </div>
+              <ul class="rule-list">
+                <li><b>廠商送回：</b>廠商預計今日將送繡衣服送回學校。</li>
+                <li><b>預計發回：</b>廠商送回學校後，將廣播通知各班領回。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 建教班特殊註記 -->
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 1rem 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+          <span style="font-size: 1.5rem;">ℹ️</span>
+          <div>
+            <b style="color: #1d4ed8;">建教班特別安排：</b>
+            <span style="color: #1e3a8a;">建教班一信乙，待 <b>12 月 1 日</b> 返校後另行協調安排送繡。</span>
+          </div>
+        </div>
+
+        <!-- 規範與教官室聯絡資訊 -->
+        <div class="info-box-grid">
+          <div class="info-card">
+            <h3>📋 送繡種類參考與學校重要注意事項</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; margin-bottom: 1rem;">
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">1. 夏季短袖制服上衣</div>
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">2. 冬季長袖制服上衣</div>
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">3. 各科實習服</div>
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">4. 帽子</div>
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">5. 夏季短袖運動上衣</div>
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">6. 冬季長袖運動上衣</div>
+              <div style="background:#f8fafc; padding:0.5rem; border-radius:4px; font-size:0.88rem;">7. 冬季棒球運動外套</div>
+            </div>
+            <p style="font-size: 0.88rem; color: #475569; line-height: 1.6;">
+              <b>備註說明：</b><br>
+              1. 本次繡學號結束後，學校將開始登記未繡學號同學。<br>
+              2. 繡學號純屬服務性質，不強迫同學參加，同學可自行在外送繡，但學號規格須符合學校樣式，欲查詢學號樣式可詢問生輔組長教官。
+            </p>
+          </div>
+
+          <div class="contact-card">
+            <div>
+              <h3>📞 生輔組長教官 諮詢窗口</h3>
+              <p style="font-size: 0.9rem; opacity: 0.9;">如有任何送繡或學號規格問題，歡迎來電洽詢：</p>
+              <div class="contact-phone">02-29411831</div>
+              <div style="font-size: 0.95rem; font-weight: bold;">或 02-29432491 轉 510</div>
+            </div>
+            <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 1rem;">
+              聯絡窗口：生輔組長 蘇教官
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================= -->
+    <!-- 分頁 3: 02 繡學號流程指南                               -->
+    <!-- ======================================================= -->
+    <section id="tab-process" class="tab-content">
+      <div style="background: white; padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+        <h2 style="color: var(--primary-color); font-size: 1.3rem;">繡學號標準作業流程 (SOP)</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">各班班長、總務股長及送繡同學請遵循以下 5 大步驟與 4 項物料進行作業：</p>
+      </div>
+
+      <div class="process-stepper">
+        <!-- 步驟 1 -->
+        <div class="process-step">
+          <div class="step-number">
+            <span class="num">1</span>
+            <span class="txt">步驟</span>
+          </div>
+          <div class="step-details">
+            <h4>幹部至教官室領取物料</h4>
+            <p>班長及總務股長至教官室領取全班所需的 4 項標籤與包裝物料：</p>
+            <div class="material-tag-group">
+              <span class="material-tag highlight">A. 繡學號小貼紙 / 人 / 一大張 (12小張)</span>
+              <span class="material-tag highlight">B. 個人塑膠袋 / 人 / 一個</span>
+              <span class="material-tag highlight">C. 塑膠袋小貼紙 / 人 / 一張</span>
+              <span class="material-tag highlight">D. 班級麻布袋</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 步驟 2 -->
+        <div class="process-step">
+          <div class="step-number">
+            <span class="num">2</span>
+            <span class="txt">步驟</span>
+          </div>
+          <div class="step-details">
+            <h4>領取 A 小貼紙並貼於衣服</h4>
+            <p>個人先向班長領取 <b>A 小貼紙</b>，並完成送繡衣服上之 A 小貼紙資料填寫（班級、座號、姓名、學號），並確實貼於預送繡之衣服上。</p>
+            <div style="color: #b91c1c; font-weight: bold; font-size: 0.9rem; margin-top: 4px;">
+              ⚠️ 注意事項：學號請務必再三確認無誤！
+            </div>
+          </div>
+        </div>
+
+        <!-- 步驟 3 -->
+        <div class="process-step">
+          <div class="step-number">
+            <span class="num">3</span>
+            <span class="txt">步驟</span>
+          </div>
+          <div class="step-details">
+            <h4>裝入 B 個人塑膠袋並貼上 C 袋標</h4>
+            <p>個人送繡衣服均完成 A 小貼紙作業後，再至班長處領取 <b>B 個人塑膠袋</b> 及 <b>C 塑膠袋小貼紙</b>。完成內容填寫後，確實貼於 B 塑膠袋外側。</p>
+          </div>
+        </div>
+
+        <!-- 步驟 4 -->
+        <div class="process-step">
+          <div class="step-number">
+            <span class="num">4</span>
+            <span class="txt">步驟</span>
+          </div>
+          <div class="step-details">
+            <h4>總務股長核對件數與收費</h4>
+            <p>同學攜帶包裝好的 B 塑膠袋至<b>總務股長</b>處，逐件核對送繡衣服件數，並依收費標準（每件55元、冬季棒球外套65元）繳交送繡件數之費用。總務股長於明細表勾稽註記。</p>
+          </div>
+        </div>
+
+        <!-- 步驟 5 -->
+        <div class="process-step">
+          <div class="step-number">
+            <span class="num">5</span>
+            <span class="txt">步驟</span>
+          </div>
+          <div class="step-details">
+            <h4>裝入 D 班級麻布袋，校門對點交件</h4>
+            <p>全班均完成個人部份作業後，班級送繡衣服全數裝進 <b>D 班級麻布袋</b>。靜候聽教官室廣播，統一送至校門口與廠商現場對點衣服件數與費用。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+
+    <!-- ======================================================= -->
+    <!-- 分頁 5: 總務現金對帳機                                  -->
+    <!-- ======================================================= -->
+    <section id="tab-cash" class="tab-content">
+      <div class="cash-calculator-card">
+        <h3 style="color: var(--primary-color); font-size: 1.2rem; margin-bottom: 0.5rem;">💵 總務股長收費面額對帳計算機</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+          將收到的各面額現金張數或枚數輸入，系統將自動比對全班應收金額，確認是否相符！
+        </p>
+
+        <div style="background: #f1f5f9; padding: 0.8rem; border-radius: var(--radius-sm); margin-bottom: 1rem; display: flex; justify-content: space-between;">
+          <span>系統應收總金額：</span>
+          <b id="expectedClassTotal" style="color: #1e3a8a; font-size: 1.2rem;">$0</b>
+        </div>
+
+        <table class="cash-table">
+          <thead>
+            <tr>
+              <th>面額</th>
+              <th style="width: 120px;">數量 (張/枚)</th>
+              <th style="text-align: right;">小計</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>💵 1000 元鈔</td>
+              <td><input type="number" min="0" id="cash-1000" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-1000">$0</td>
+            </tr>
+            <tr>
+              <td>💵 500 元鈔</td>
+              <td><input type="number" min="0" id="cash-500" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-500">$0</td>
+            </tr>
+            <tr>
+              <td>💵 100 元鈔</td>
+              <td><input type="number" min="0" id="cash-100" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-100">$0</td>
+            </tr>
+            <tr>
+              <td>🪙 50 元硬幣</td>
+              <td><input type="number" min="0" id="cash-50" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-50">$0</td>
+            </tr>
+            <tr>
+              <td>🪙 10 元硬幣</td>
+              <td><input type="number" min="0" id="cash-10" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-10">$0</td>
+            </tr>
+            <tr>
+              <td>🪙 5 元硬幣</td>
+              <td><input type="number" min="0" id="cash-5" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-5">$0</td>
+            </tr>
+            <tr>
+              <td>🪙 1 元硬幣</td>
+              <td><input type="number" min="0" id="cash-1" class="input-control" style="width: 90px;" value="0" oninput="calcCashTotal()"></td>
+              <td style="text-align: right;" id="sub-1">$0</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="2">實收現金總計</th>
+              <th style="text-align: right; color: #16a34a; font-size: 1.2rem;" id="actualCashTotal">$0</th>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div id="cashDiffAlert" class="diff-alert match">
+          請輸入實際收取的現金面額數量進行比對
+        </div>
+      </div>
+  </main>
+
+  <!-- 手機版底部常駐懸浮資訊條 (Mobile Sticky Summary Bar) -->
+  <aside id="mobileSummaryBar" class="mobile-summary-bar">
+    <div class="mobile-summary-content">
+      <div class="mobile-sum-item">
+        <span class="mobile-sum-label">應收總額</span>
+        <span class="mobile-sum-val" id="mobileSumGrandTotal">$0</span>
+      </div>
+      <div class="mobile-sum-divider"></div>
+      <div class="mobile-sum-item">
+        <span class="mobile-sum-label">已收 / 人數</span>
+        <div class="mobile-sum-val-row">
+          <span class="mobile-sum-val" id="mobileSumPaid">$0</span>
+          <span class="mobile-sum-sub" id="mobileSumPaidCount">(0/31人)</span>
+        </div>
+      </div>
+    </div>
+    <div class="mobile-summary-actions">
+      <button type="button" class="mobile-bar-btn warning" onclick="openSyncHubModal()" title="手機傳送至電腦">
+        📲 同步
+      </button>
+      <button type="button" class="mobile-bar-btn" onclick="scrollToTop()" title="回到最頂端">
+        ⬆️ 頂部
+      </button>
+      <button type="button" class="mobile-bar-btn primary" onclick="quickToggleViewMode()" id="mobileToggleModeBtn" title="切換卡片與表格檢視">
+        🔄 表格
+      </button>
+    </div>
+  </aside>
+
+  <!-- 📲 手機 ⇄ 電腦跨裝置同步精靈 (Modal / Bottom Sheet) -->
+  <div id="syncHubModal" class="sync-modal-overlay" style="display: none;" onclick="handleSyncOverlayClick(event)">
+    <div class="sync-modal-box">
+      <!-- 頂部標題與關閉 -->
+      <div class="sync-modal-header">
+        <div class="sync-modal-title">
+          <span class="sync-title-icon">📲</span>
+          <div>
+            <h3>手機 ⇄ 電腦 同步傳送精靈</h3>
+            <p>手機填寫好後快速傳送到電腦，或電腦讀取最新名冊</p>
+          </div>
+        </div>
+        <button type="button" class="sync-modal-close" onclick="closeSyncHubModal()">✕</button>
+      </div>
+
+      <!-- 說明引導橫幅 -->
+      <div class="sync-why-alert">
+        💡 <b>為什麼手機填好，電腦打開會沒有？</b><br>
+        因為瀏覽器為保護隱私，手機上填寫的資料預設保存在手機內部，不會自動寫入電腦檔案。只需使用以下任一方式，<b>5 秒鐘即可將手機資料傳給電腦</b>！
+      </div>
+
+      <!-- 頁籤切換：手機傳電腦 VS 電腦收手機 -->
+      <div class="sync-device-tabs">
+        <button type="button" class="sync-tab-btn active" id="tabSyncFromPhone" onclick="switchSyncTab('phone')">
+          📱 我在手機 (要傳資料給電腦)
+        </button>
+        <button type="button" class="sync-tab-btn" id="tabSyncToPC" onclick="switchSyncTab('pc')">
+          💻 我在電腦 (要接收手機資料)
+        </button>
+      </div>
+
+      <!-- 📱 手機端操作面板 -->
+      <div id="syncPanelPhone" class="sync-panel active">
+        <div class="sync-step-card primary-card">
+          <div class="sync-step-badge">方式 1 (最神速・免存檔案・推薦)</div>
+          <h4>🔗 產生 LINE / 電腦同步連結</h4>
+          <p>將目前全班名冊與費用資料一鍵編碼，傳到自己的 LINE，電腦打開立刻自動同步！</p>
+          <div class="sync-action-row">
+            <button type="button" class="btn btn-primary" onclick="copySyncLink()">
+              🔗 複製電腦同步連結 (傳到 LINE)
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="shareViaNavigator()">
+              💬 系統分享 (LINE/AirDrop)
+            </button>
+          </div>
+        </div>
+
+        <div class="sync-step-card">
+          <div class="sync-step-badge">方式 2 (直接傳 Excel)</div>
+          <h4>📊 手機直接下載 Excel 檔 (.xls)</h4>
+          <p>手機點擊直接下載 Excel 檔，透過 LINE / 郵件傳給電腦，電腦打開就是最新收費表！</p>
+          <div class="sync-action-row">
+            <button type="button" class="btn btn-success" onclick="exportToExcel()">
+              📊 在手機下載 Excel 檔 (.xls)
+            </button>
+          </div>
+        </div>
+
+        <div class="sync-step-card">
+          <div class="sync-step-badge">方式 3 (備份同步檔)</div>
+          <h4>💾 下載手機同步備份檔 (.json)</h4>
+          <p>下載輕量備份檔傳給電腦，電腦端一秒匯入還原全班名冊。</p>
+          <div class="sync-action-row">
+            <button type="button" class="btn btn-secondary" onclick="exportSyncBackupFile()">
+              📥 下載手機同步備份檔 (.json)
+            </button>
+            <button type="button" class="btn btn-outline-dark" onclick="copySyncCodeOnly()">
+              📋 僅複製同步文字碼
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 💻 電腦端操作面板 -->
+      <div id="syncPanelPC" class="sync-panel">
+        <div class="sync-step-card primary-card">
+          <div class="sync-step-badge">方式 1 (最快)</div>
+          <h4>📋 貼上手機傳來的同步連結或代碼</h4>
+          <p>將手機透過 LINE 傳來的連結或代碼貼在下方，點擊「套用同步」即可載入全班名冊：</p>
+          <div class="sync-input-wrap">
+            <textarea id="syncCodeInput" class="sync-textarea" placeholder="請在此貼上手機傳來的同步連結或代碼..."></textarea>
+            <button type="button" class="btn btn-primary" onclick="applySyncCodeFromInput()" style="width: 100%; margin-top: 8px;">
+              ✅ 套用同步・載入全班名冊
+            </button>
+          </div>
+        </div>
+
+        <div class="sync-step-card">
+          <div class="sync-step-badge">方式 2 (檔案匯入)</div>
+          <h4>📂 匯選手機傳來的檔案 (.json / .csv)</h4>
+          <p>選取從手機 LINE 或郵件接收到的備份檔案或 CSV 檔：</p>
+          <div class="sync-action-row">
+            <label class="btn btn-success" style="cursor: pointer; margin: 0;">
+              📂 選取手機傳來的檔案匯入
+              <input type="file" id="syncBackupFileInput" accept=".json,.csv,.txt" style="display: none;" onchange="handleSyncBackupFileImport(event)">
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
