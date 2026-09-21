@@ -70,9 +70,19 @@ function loadSavedData() {
     const saved = localStorage.getItem("ck_embroidery_data_v1");
     if (saved) {
       const parsed = JSON.parse(saved);
-      appData = parsed;
-      if (!appData.className || appData.className === "資處一甲") {
-        appData.className = "資處一仁";
+      if (parsed && typeof parsed === "object") {
+        appData.className = parsed.className || "資處一仁";
+        if (appData.className === "資處一甲") appData.className = "資處一仁";
+        appData.leaderSign = parsed.leaderSign || "";
+        appData.affairsSign = parsed.affairsSign || "";
+        appData.tutorSign = parsed.tutorSign || "";
+        if (Array.isArray(parsed.students) && parsed.students.length > 0) {
+          appData.students = parsed.students;
+        } else {
+          appData.students = initDefaultStudents();
+        }
+      } else {
+        appData.students = initDefaultStudents();
       }
       while (appData.students.length < TOTAL_STUDENTS) {
         const nextSeat = appData.students.length + 1;
@@ -96,7 +106,13 @@ function loadSavedData() {
     }
   } catch (e) {
     console.error("載入本機儲存失敗，使用預設值", e);
-    appData.students = initDefaultStudents();
+    appData = {
+      className: "資處一仁",
+      leaderSign: "",
+      affairsSign: "",
+      tutorSign: "",
+      students: initDefaultStudents()
+    };
   }
 }
 
@@ -922,6 +938,8 @@ function fallbackClipboard(text) {
     alert("複製失敗，請直接點選【下載 Excel 檔】！");
   }
   document.body.removeChild(ta);
+}
+
 // -------------------------------------------------------------
 // 📲 手機 ⇄ 電腦 跨裝置同步精靈核心功能
 // -------------------------------------------------------------
